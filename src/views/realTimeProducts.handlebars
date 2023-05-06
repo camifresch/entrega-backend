@@ -1,0 +1,21 @@
+<div>
+    <h1>REAL TIME PRODUCTS</h1>
+    {{#each products}}
+        <div><b>Producto n*{{this.id}}</b></div>
+        <ul>
+            <li>{{this.title}}</li>
+            <li>{{this.description}}</li>
+            <li>Precio: ${{this.price}}</li>
+            <li>Stock: {{this.stock}}</li>
+        </ul>
+    {{/each}}
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.6.1/socket.io.js"></script>
+<script>
+    const wsc = io('ws://localhost:3000');
+    wsc.on('connect', () => {
+        wsc.emit('solicitud_client', 'Cliente escuchando');
+        wsc.on('server_confirm', (msg) => console.log(msg));
+    })
+</script>

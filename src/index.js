@@ -5,10 +5,21 @@ import { engine } from "express-handlebars";
 import __dirname from "./utils.js"
 import * as path from "path"
 import ProductManager from "./controllers/ProductManager.js";
+import { Server } from "socket.io";
 
 const app = express()
 const PORT = 8080
+const WS_PORT = 3000
+const httpServer = app.listen(WS_PORT, () => {
+    console.log(`Servidor Socket.io iniciado en puerto ${WS_PORT}`)
+})
+const wss = new Server(httpServer, {
+    cors: {
+        origin: "http://localhost:8080"
+      }
+})
 const product = new ProductManager();
+
 
 app.use(express.json())
 app.use(express.urlencoded({extended: true}));
@@ -36,9 +47,26 @@ app.get("/:id", async (req, res) => {
     })
 })
 
+// eventos websocket
+wss.on('connection', (socket) => {
+    console.log(`Nuevo cliente conectado: ${socket.id}`);
+  
+    socket.emit('server_confirm', 'Conexion recibida');
+  
+    socket.on('disconnect', (reason) => {
+      console.log(`Cliente desconectado (${socket.id}): ${reason}`);
+    })
+  
+    //escuchamos eventos desde el cliente
+    socket.on('solicitud_client', (data) => {
+      console.log(data);
+    })
+  });
+
+
 app.use("/api/product", ProductRouter) 
 app.use("/api/cart", CartRouter)
 
 app.listen(PORT, () =>{
-    console.log(`Servidor Express Puerto ${PORT}`)
+    console.log(`Servidor Express iniciado en Puerto ${PORT}`)
 })
