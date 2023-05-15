@@ -2,10 +2,10 @@ import { Router } from "express";
 import __dirname from "../utils.js";
 import ProductManager from "../controllers/ProductManager.js";
 
-const viewRouter = Router()
+const ViewRouter = Router()
 const productManager = new ProductManager((`${__dirname}/../src/models/products.json`))
 
-viewRouter.get('/', async (req, res) => {
+ViewRouter.get('/', async (req, res) => {
     try {
       const productos = await productManager.getProducts( req.query.limit || 0 ); 
       res.render('realTimeProducts', {products: productos });
@@ -14,4 +14,4 @@ viewRouter.get('/', async (req, res) => {
     } 
 });
 
-export default viewRouter;
+export default ViewRouter;

@@ -6,6 +6,7 @@ import __dirname from "./utils.js"
 import * as path from "path"
 import ProductManager from "./controllers/ProductManager.js";
 import { Server } from "socket.io";
+import ViewRouter from "./router/views.routes.js";
 
 const app = express()
 const PORT = 8080
@@ -33,39 +34,39 @@ app.use("/", express.static(__dirname + "/public"))
 
 app.get("/", async (req, res) => {
     let allProducts = await product.getProducts()
-    res.render("home", {
+    res.render("index", {
         title: "Express Avanzado | Handlebars",
         products: allProducts
     })
 })
 
-app.get("/:id", async (req, res) => {
+/*app.get("/", async (req, res) => {
     let prod = await product.getProductsById(req.params.id)
     res.render("prod", {
         title: "Express Avanzado | Handlebars",
         products: prod
     })
-})
+})*/
 
 // eventos websocket
 wss.on('connection', (socket) => {
     console.log(`Nuevo cliente conectado: ${socket.id}`);
-  
     socket.emit('server_confirm', 'Conexion recibida');
-  
-    socket.on('disconnect', (reason) => {
-      console.log(`Cliente desconectado (${socket.id}): ${reason}`);
-    })
-  
-    //escuchamos eventos desde el cliente
-    socket.on('solicitud_client', (data) => {
-      console.log(data);
-    })
-  });
+
+  socket.on('disconnect', (reason) => {
+    console.log(`Cliente desconectado (${socket.id}): ${reason}`);
+  })
+
+  //escuchamos eventos desde el cliente
+  socket.on('solicitud_client', (data) => {
+    console.log(data);
+  })
+});
 
 
 app.use("/api/product", ProductRouter) 
 app.use("/api/cart", CartRouter)
+app.use('/realtimeproducts', ViewRouter);
 
 app.listen(PORT, () =>{
     console.log(`Servidor Express iniciado en Puerto ${PORT}`)

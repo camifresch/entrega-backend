@@ -10,7 +10,7 @@ ProductRouter.get("/", async (req, res) =>{
 })
 
 ProductRouter.get("/:pid", async (req, res) =>{
-    let id = req.params.id
+    let id = req.params.pid
     res.send(await product.getProductsById(id))
 })
 
@@ -20,13 +20,13 @@ ProductRouter.post("/", async (req, res) =>{
 })
 
 ProductRouter.put("/:pid", async (req, res) =>{
-    let id = req.params.id
+    let id = req.params.pid
     let updateProduct = req.body
     res.send(await product.updateProduct(id, updateProduct))
 })
 
 ProductRouter.delete("/:pid", async (req, res) =>{
-    let id = req.params.id
+    let id = req.params.pid
     res.send(await product.deleteProducts(id))
 })
 
