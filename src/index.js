@@ -40,14 +40,6 @@ app.get("/", async (req, res) => {
     })
 })
 
-/*app.get("/", async (req, res) => {
-    let prod = await product.getProductsById(req.params.id)
-    res.render("prod", {
-        title: "Express Avanzado | Handlebars",
-        products: prod
-    })
-})*/
-
 // eventos websocket
 wss.on('connection', (socket) => {
     console.log(`Nuevo cliente conectado: ${socket.id}`);
