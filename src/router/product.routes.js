@@ -1,33 +1,41 @@
 import {Router} from "express";
 import ProductManager from ".././controllers/ProductManager.js";
 
-const ProductRouter = Router()
-const product = new ProductManager();
 
+const ProductRouter = (io) => {
+    const router = Router();
+    const product = new ProductManager();
+    
+    router.get('/products_index', async (req, res) => {
+        const products = await manager.getProducts();
+        res.render('index_products', {
+            products: products
+        });
+    });
 
-ProductRouter.get("/", async (req, res) =>{
-    res.send(await product.getProducts())
-})
-
-ProductRouter.get("/:pid", async (req, res) =>{
+    router.get("/:pid", async (req, res) =>{
     let id = req.params.pid
     res.send(await product.getProductsById(id))
 })
 
-ProductRouter.post("/", async (req, res) =>{
+    router.post("/", async (req, res) =>{
     let newProduct = req.body
     res.send(await product.addProducts(newProduct))
+    io.emit('new_prod', req.body);
 })
 
-ProductRouter.put("/:pid", async (req, res) =>{
+router.put("/:pid", async (req, res) =>{
     let id = req.params.pid
     let updateProduct = req.body
     res.send(await product.updateProduct(id, updateProduct))
 })
 
-ProductRouter.delete("/:pid", async (req, res) =>{
+router.delete("/:pid", async (req, res) =>{
     let id = req.params.pid
     res.send(await product.deleteProducts(id))
 })
+
+return router;
+}
 
 export default ProductRouter

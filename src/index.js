@@ -7,18 +7,19 @@ import * as path from "path"
 import ProductManager from "./controllers/ProductManager.js";
 import { Server } from "socket.io";
 import ViewRouter from "./router/views.routes.js";
+import http from 'http';
+
 
 const app = express()
-const PORT = 8080
-const WS_PORT = 3000
-const httpServer = app.listen(WS_PORT, () => {
-    console.log(`Servidor Socket.io iniciado en puerto ${WS_PORT}`)
-})
-const wss = new Server(httpServer, {
+const PORT = 3000
+const server = http.createServer(app);
+const io = new Server(server, {
     cors: {
-        origin: "http://localhost:8080"
-      }
-})
+        origin: "*",
+        methods: ["PUT", "GET", "POST", "DELETE", "OPTIONS"],
+        credentials: false
+    }
+});
 const product = new ProductManager();
 
 
@@ -41,25 +42,24 @@ app.get("/", async (req, res) => {
 })
 
 // eventos websocket
-wss.on('connection', (socket) => {
+io.on('connection', (socket) => {
     console.log(`Nuevo cliente conectado: ${socket.id}`);
     socket.emit('server_confirm', 'Conexion recibida');
 
-  socket.on('disconnect', (reason) => {
-    console.log(`Cliente desconectado (${socket.id}): ${reason}`);
-  })
-
-  //escuchamos eventos desde el cliente
-  socket.on('solicitud_client', (data) => {
-    console.log(data);
-  })
+    socket.on('new_message', (data) => {;
+      io.emit('msg_received', data);
+  });
+  
+  socket.on("disconnect", (reason) => {
+      console.log(`Cliente desconectado (${socket.id}): ${reason}`);
+  });
 });
 
 
-app.use("/api/product", ProductRouter) 
+app.use("/api/product", ProductRouter(io)) 
 app.use("/api/cart", CartRouter)
 app.use('/realtimeproducts', ViewRouter);
 
-app.listen(PORT, () =>{
-    console.log(`Servidor Express iniciado en Puerto ${PORT}`)
-})
+server.listen(PORT, () => {
+  console.log(`Servidor API/Socket.io iniciado en puerto ${PORT}`);
+});
