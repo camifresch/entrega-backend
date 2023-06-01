@@ -52,7 +52,7 @@
     });
 
     socket.on('msg_received', (data) => {
-        messagesLog.innerHTML = `${messagesLog.innerHTML}<br>(${data.user}) ${data.msg}`;
+        prodLog.innerHTML = `${prodLog.innerHTML}<br>(${data.user}) ${data.msg}`;
     });
 
     // Este evento llega desde el endpoint POST
