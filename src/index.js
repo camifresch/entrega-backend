@@ -1,17 +1,21 @@
+
+import {} from 'dotenv/config'
 import express from "express";
 import ProductRouter from "./router/product.routes.js"
 import CartRouter from "./router/carts.routes.js";
 import { engine } from "express-handlebars";
 import __dirname from "./utils.js"
 import * as path from "path"
-import ProductManager from "./controllers/ProductManager.js";
+import Products from "./controllers/ProductManager.js";
 import { Server } from "socket.io";
 import ViewRouter from "./router/views.routes.js";
 import http from 'http';
+import mongoose from "mongoose";
 
 
 const app = express()
-const PORT = 3000
+const PORT = parseInt(process.env.PORT) || 3000;
+const MONGOOSE_URL = process.env.MONGOOSE_URL || 'mongodb://127.0.0.1';
 const server = http.createServer(app);
 const io = new Server(server, {
     cors: {
@@ -20,7 +24,7 @@ const io = new Server(server, {
         credentials: false
     }
 });
-const product = new ProductManager();
+const product = new Products();
 
 
 app.use(express.json())
@@ -60,6 +64,12 @@ app.use("/api/product", ProductRouter(io))
 app.use("/api/cart", CartRouter)
 app.use('/realtimeproducts', ViewRouter);
 
-server.listen(PORT, () => {
-  console.log(`Servidor API/Socket.io iniciado en puerto ${PORT}`);
-});
+try {
+    await mongoose.connect(MONGOOSE_URL);
+    server.listen(PORT, () => {
+        console.log(`Servidor API/Socket.io iniciado en puerto ${PORT}`);
+    });
+
+} catch(err) {
+    console.log('No se puede conectar con el servidor de bbdd');
+}

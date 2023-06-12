@@ -1,8 +1,9 @@
 import {promises as fs} from 'fs';
 import {nanoid} from 'nanoid';
-import ProductManager from './ProductManager.js';
+import Products from './ProductManager.js';
+import cartsModel from '../models/carts.model.js';
 
-const productAll = new ProductManager
+const productAll = new Products
 
 class CartManager {
     constructor() {
@@ -23,19 +24,50 @@ class CartManager {
         return carts.find(cart => cart.id === id)
     }
 
+    getCarts = async () => {
+        try {
+          const carts = await cartsModel.find().populate("products.pid");
+          return !carts.length
+            ? {
+              status: 404,
+              error: "No se encontraron carritos",
+            }
+            : carts;
+        } catch (err) {
+          return {
+            status: 500,
+            error: `Ocurrió un error al intentar obtener los carritos: ${err}`,
+          };
+        }
+      }
+
     addCarts = async () => {
-        let cartsOld = await this.readCarts()
-        let id = nanoid()
-        let cartsConcat = [{id : id, products : []}, ...cartsOld]
-        await this.writeCarts(cartsConcat)
-        return "Carrito Agregado"
-    }
+        try {
+            return await cartsModel.create({ products: [] });
+          } catch (err) {
+            return {
+              status: 500,
+              error: `Ocurrió un error al intentar crear el carrito: ${err}`,
+            };
+          }
+        }
 
     getCartsById = async (id) => {
-        let cartById = await this.exist(id)
-        if(!cartById) return "Carrito no encontrado"
-        return cartById
-    };
+        try {
+            const cart = await cartsModel.findById(id).lean().populate("products.pid");
+            return cart === null
+              ? {
+                status: 404,
+                error: `No se encontró el carrito con ID [${id}]`,
+              }
+              : cart.products;
+          } catch (err) {
+            return {
+              status: 500,
+              error: `Ocurrió un error al intentar obtener el carrito con ID [${id}]: ${err}`,
+            };
+          }
+        }
 
     addProductInCart = async (cartId, productId) =>{
         let cartById = await this.exist(cartId)

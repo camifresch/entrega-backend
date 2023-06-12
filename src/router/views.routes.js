@@ -1,17 +1,49 @@
 import { Router } from "express";
 import __dirname from "../utils.js";
-import ProductManager from "../controllers/ProductManager.js";
+import Products from "../controllers/ProductManager.js";
+import CartManager from "../controllers/CartManager.js";
 
 const ViewRouter = Router()
-const productManager = new ProductManager((`${__dirname}/../src/models/products.json`))
+const productManager = new Products((`${__dirname}/../src/models/products.json`))
+const cartManager = new CartManager();
 
-ViewRouter.get('/', async (req, res) => {
-    try {
-      const productos = await productManager.getProducts( req.query.limit || 0 ); 
-      res.render('realTimeProducts', {products: productos });
-    } catch(error) {
-      res.status(500).send({ error: 'Error al intentar obtener los productos' })
-    } 
+ViewRouter.get("/products?", async (req, res) => {
+  const { query, limit, page, sort } = req.query;
+  let {
+    payload,
+    hasNextPage,
+    hasPrevPage,
+    nextLink,
+    prevLink,
+    page: resPage,
+  } = await productManager.getProducts(query, limit, page, sort);
+  if (hasNextPage)
+    nextLink = `http://localhost:3000/products/?${
+      query ? "query=" + query + "&" : ""
+    }${"limit=" + limit}${"&page=" + (+resPage + 1)}${
+      sort ? "&sort=" + sort : ""
+    }`;
+  if (hasPrevPage)
+    prevLink = `http://localhost:3000/products/?${
+      query ? "query=" + query + "&" : ""
+    }${"limit=" + limit}${"&page=" + (+resPage - 1)}${
+      sort ? "&sort=" + sort : ""}`;
+  res.render("products", {
+    payload,
+    hasNextPage,
+    hasPrevPage,
+    nextLink,
+    prevLink,
+    resPage,
+  });
 });
+
+
+ViewRouter.get("/carts/:cid", async (req, res) => {
+  const id = req.params.cid;
+  const cart = await cartManager.getCartById(id);
+  cart.error ? res.render("404", {}) : res.render("cart", { cart });
+});
+
 
 export default ViewRouter;
