@@ -2,14 +2,17 @@ import mongoose from 'mongoose';
 
 mongoose.pluralize(null);
 
-const collection = 'usersbig';
+const collection = 'users';
 
 const schema = new mongoose.Schema({
-    first_name: { type: String, index: true },
-    last_name: String,
-    email: String,
-    gender: String
+    firstName: { type: String, required: true },
+    lastName: { type: String, required: true },
+    userName: { type: String, required: true },
+    password: { type: String, required: true },
+    gender: { type: String, enum: ['F', 'M']},
+    avatar: String
 });
+
 
 const userModel = mongoose.model(collection, schema);
 
