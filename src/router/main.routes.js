@@ -15,7 +15,7 @@ const mainRoutes = (io, store, baseUrl, productsPerPage) => {
 
             if (data !== null && (req.session.userValidated || req.sessionStore.userValidated)) {
                 if (req.query.page === undefined) req.query.page = 0;
-    
+            
                 const result = await manager.getProductsPaginated(req.query.page * productsPerPage, productsPerPage);
     
                 const pagesArray = [];
@@ -34,8 +34,10 @@ const mainRoutes = (io, store, baseUrl, productsPerPage) => {
                     hasNextPage: result.hasNextPage,
                     pagesArray: pagesArray
                 }
-    
-                res.render('products', { products: result.docs, pagination: pagination });
+
+                res.render('products', { products: result.docs, pagination: pagination, user: req.session.user});
+                
+                   
             } else {
                 res.render('login', {
                     sessionInfo: req.session.userValidated !== undefined ? req.session : req.sessionStore
@@ -67,6 +69,8 @@ const mainRoutes = (io, store, baseUrl, productsPerPage) => {
         } else {
             req.session.userValidated = req.sessionStore.userValidated = true;
             req.session.errorMessage = req.sessionStore.errorMessage = '';
+            req.session.user = user;
+            
         }
 
         res.redirect(baseUrl);

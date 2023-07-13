@@ -1,5 +1,7 @@
 import mongoose from 'mongoose';
 import userModel from '../models/users.model.js';
+import { createHash } from 'node:crypto'
+
 
 class Users {
     constructor() {
@@ -15,7 +17,7 @@ class Users {
     }
 
     static #generarSha256 = (pass) => {
-        return crypto.createHash('sha256').update(pass).digest('hex');
+        return createHash('sha256').update(pass).digest('hex');
     }
 
     static #objEmpty (obj) {
@@ -99,9 +101,10 @@ class Users {
 
     validateUser = async (user, pass) => {
         try {
-            return await userModel.findOne({ userName: user, password: crypto.createHash('sha256').update(pass).digest('hex')});
+            return await userModel.findOne({ userName: user, password: createHash('sha256').update(pass).digest('hex')});
         } catch (err) {
             this.status = `validateUser: ${err}`;
+
         }
     }
 }
