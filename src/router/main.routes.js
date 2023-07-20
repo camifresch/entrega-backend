@@ -36,8 +36,6 @@ const mainRoutes = (io, store, baseUrl, productsPerPage) => {
                 }
 
                 res.render('products', { products: result.docs, pagination: pagination, user: req.session.user});
-                
-                   
             } else {
                 res.render('login', {
                     sessionInfo: req.session.userValidated !== undefined ? req.session : req.sessionStore
