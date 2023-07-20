@@ -1,6 +1,6 @@
 import mongoose from 'mongoose';
 import userModel from '../models/users.model.js';
-import { createHash } from 'node:crypto'
+import { createHash } from '../utils.js';
 
 
 class Users {
@@ -101,7 +101,7 @@ class Users {
 
     validateUser = async (user, pass) => {
         try {
-            return await userModel.findOne({ userName: user, password: createHash('sha256').update(pass).digest('hex')});
+            return await userModel.findOne({ userName: user, password: createHash(pass)});
         } catch (err) {
             this.status = `validateUser: ${err}`;
 
