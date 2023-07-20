@@ -12,4 +12,4 @@ const isValidPassword = (passInDb, passToCompare) => {
     return bcrypt.compareSync(passToCompare, passInDb);
 }
 
-export { __filename, __dirname, createHash, isValidPassword };
+export default { __filename, __dirname, createHash, isValidPassword };
