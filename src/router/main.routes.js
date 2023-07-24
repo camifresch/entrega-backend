@@ -13,7 +13,7 @@ const mainRoutes = (io, store, baseUrl, productsPerPage) => {
         store.get(req.sessionID, async (err, data) => {
             if (err) console.log(`Error al recuperar datos de sesión (${err})`);
 
-            if (data !== null && (req.session.userValidated || req.sessionStore.userValidated)) {
+            if (data !== null && req.sessionStore.userValidated){
                 if (req.query.page === undefined) req.query.page = 0;
             
                 const result = await manager.getProductsPaginated(req.query.page * productsPerPage, productsPerPage);
@@ -37,9 +37,7 @@ const mainRoutes = (io, store, baseUrl, productsPerPage) => {
 
                 res.render('products', { products: result.docs, pagination: pagination, user: req.session.user});
             } else {
-                res.render('login', {
-                    sessionInfo: req.session.userValidated !== undefined ? req.session : req.sessionStore
-                });
+                res.render('login', { sessionInfo: req.sessionStore });
             }
         }); 
     });

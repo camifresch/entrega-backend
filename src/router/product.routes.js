@@ -6,7 +6,15 @@ const ProductRouter = (io) => {
     const router = Router();
     const product = new Products();
     
-    router.get('/?', async (req, res) => {
+    const validate = async (req, res, next) => {
+        if (req.session.userValidated) {
+            next();
+        } else {
+            res.status(401).sebd({ status: 'ERR', error: 'No tiene autorizacion para realizar esta solicitud'});
+        }
+    }
+
+    router.get('/products', validate, async (req, res) => {
         try {
             const { query, limit, page, sort } = req.query;
             const products = await manager.getProducts(query, limit, page, sort);
@@ -16,7 +24,7 @@ const ProductRouter = (io) => {
         }
     });
 
-    router.get('/:pid', async (req, res) => {
+    router.get('/:pid', validate, async (req, res) => {
         try {
             const id = req.params.pid;
             const product = await manager.getProductById(id);
@@ -26,7 +34,7 @@ const ProductRouter = (io) => {
         }
     });
 
-router.post('/', async (req, res) => {
+router.post('/', validate, async (req, res) => {
     const {
         title,
         description,
@@ -50,13 +58,13 @@ router.post('/', async (req, res) => {
     }
 });
 
-router.put("/:pid", async (req, res) =>{
+router.put("/:pid", validate, async (req, res) =>{
     let id = req.params.pid
     let updateProduct = req.body
     res.send(await product.updateProduct(id, updateProduct))
 })
 
-router.delete("/:pid", async (req, res) =>{
+router.delete("/:pid", validate, async (req, res) =>{
     let id = req.params.pid
     res.send(await product.deleteProducts(id))
 })

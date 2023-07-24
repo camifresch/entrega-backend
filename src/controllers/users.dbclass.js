@@ -101,7 +101,7 @@ class Users {
 
     validateUser = async (user, pass) => {
         try {
-            return await userModel.findOne({ userName: user, password: createHash('sha256').update(pass).digest('hex')});
+            return await userModel.findOne({ userName: user, password: pass});
         } catch (err) {
             this.status = `validateUser: ${err}`;
 

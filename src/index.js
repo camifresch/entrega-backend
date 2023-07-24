@@ -6,7 +6,7 @@ import CartRouter from "./router/carts.routes.js";
 import { engine } from "express-handlebars";
 import cookieParser from 'cookie-parser';
 import session from 'express-session';
-import FileStore from 'session-file-store';
+import MongoStore from 'connect-mongo';
 import __dirname from "./utils.js"
 import * as path from "path"
 import Products from "./controllers/ProductManager.js";
@@ -22,6 +22,8 @@ const app = express()
 const PORT = parseInt(process.env.PORT) || 3000;
 const MONGOOSE_URL = process.env.MONGOOSE_URL || 'mongodb://127.0.0.1';
 const COOKIE_SECRET = process.env.COOKIE_SECRET;
+const BASE_URL = `http://localhost:${PORT}`;
+const PRODUCTS_PER_PAGE = 10;
 const server = http.createServer(app);
 const io = new Server(server, {
     cors: {
@@ -39,9 +41,8 @@ app.use(express.urlencoded({extended: true}));
 app.use(cookieParser(COOKIE_SECRET));
 
 // sesiones
-const fileStorage = FileStore(session);
 
-const store = new fileStorage({ path: `${__dirname}/sessions`, ttl: 3600, retries: 0 });
+const store =  MongoStore.create({ mongoUrl: MONGOOSE_URL, mongoOptions: {}, ttl: 30 });
 app.use(session({
     store: store,
     secret: COOKIE_SECRET,
@@ -52,7 +53,7 @@ app.use(session({
 //estructura handlebars
 app.engine("handlebars", engine())
 app.set("view engine", "handlebars")
-app.set("views", path.resolve(__dirname + "/views") )
+app.set('views', `${__dirname}/views`);
 
 app.use("/", express.static(__dirname + "/public"))
 
@@ -76,7 +77,7 @@ app.use("/api/product", ProductRouter(io))
 app.use("/api/cart", CartRouter)
 app.use('/realtimeproducts', ViewRouter);
 app.use('/api', UsersRouter(io));
-app.use('/', mainRoutes(io, store, `http://localhost:${PORT}`, 10));
+app.use('/', mainRoutes(io, store, BASE_URL, PRODUCTS_PER_PAGE));
 
 try {
     await mongoose.connect(MONGOOSE_URL);
