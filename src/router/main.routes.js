@@ -1,6 +1,9 @@
 import { Router } from "express";
 import Users from "../controllers/users.dbclass.js";
 import Products from "../controllers/ProductManager.js";
+import { createHash, isValidPassword } from "../utils.js";
+import userModel from "../models/users.model.js";
+
 
 const users = new Users();
 const manager = new Products();
@@ -13,7 +16,7 @@ const mainRoutes = (io, store, baseUrl, productsPerPage) => {
         store.get(req.sessionID, async (err, data) => {
             if (err) console.log(`Error al recuperar datos de sesión (${err})`);
 
-            if (data !== null && req.sessionStore.userValidated){
+            if (data !== null && (req.sessionStore.userValidated)){
                 if (req.query.page === undefined) req.query.page = 0;
             
                 const result = await manager.getProductsPaginated(req.query.page * productsPerPage, productsPerPage);
@@ -35,43 +38,66 @@ const mainRoutes = (io, store, baseUrl, productsPerPage) => {
                     pagesArray: pagesArray
                 }
 
-                res.render('products', { products: result.docs, pagination: pagination, user: req.session.user});
+                res.render('products', { products: result.docs, pagination: pagination, user: req.sessionStore });
             } else {
                 res.render('login', { sessionInfo: req.sessionStore });
             }
         }); 
     });
 
+    router.get('/register', async (req, res) => {
+        res.render('registration', {});
+    });
+
+    
+    
     router.get('/logout', async (req, res) => {
         req.session.userValidated = req.sessionStore.userValidated = false;
-
+        
         req.session.destroy((err) => {
             req.sessionStore.destroy(req.sessionID, (err) => {
                 if (err) console.log(`Error al destruir sesión (${err})`);
-
+                
                 console.log('Sesión destruída');
                 res.redirect(baseUrl);
             });
         })
     });
-
+    
     router.post('/login', async (req, res) => {
+        req.sessionStore.userValidated = false
         const { login_email, login_password } = req.body; 
-        const user = await users.validateUser(login_email, login_password);
-
-        if (user === null) { 
-            req.session.userValidated = req.sessionStore.userValidated = false;
-            req.session.errorMessage = req.sessionStore.errorMessage = 'Usuario o clave no válidos';
-        } else {
-            req.session.userValidated = req.sessionStore.userValidated = true;
-            req.session.errorMessage = req.sessionStore.errorMessage = '';
-            req.session.user = user;
+        const user = await userModel.findOne({ userName: login_email });
+        
+        if (!user) { 
+            req.sessionStore.errorMessage = 'No se encuentra el usuario'
+            res.redirect('http://localhost:3000');
+        } else if (!isValidPassword(user, login_password)) {
+            req.sessionStore.errorMessage = 'Clave incorrecta'
+            res.redirect('http://localhost:3000');
             
+        } else {
+            req.sessionStore.userValidated = true;
+            req.sessionStore.errorMessage = '';
+            req.sessionStore.firstName = user.firstName;
+            req.sessionStore.lastName = user.lastName;
+            res.redirect('http://localhost:3000');
         }
+        
+        router.post('/register', async (req, res) => {
+            const { firstName, lastName, userName, password } = req.body;
+            if (!firstName || !lastName || !userName || !password ) res.status(400).send('Faltan campos obligatorios en el body');
+            const newUser = { firstName: firstName, lastName: lastName, userName: userName, password: createHash(password)};
+            
+            console.log(newUser)
+            const process = userModel.create(newUser)
+            res.status(200).send(process);
+        });
+
 
         res.redirect(baseUrl);
     });
-
+    
     return router;
 }
 

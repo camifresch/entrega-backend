@@ -8,8 +8,8 @@ const createHash = (pass) => {
     return bcrypt.hashSync(pass, bcrypt.genSaltSync(10));
 }
 
-const isValidPassword = (passInDb, passToCompare) => {
-    return bcrypt.compareSync(passToCompare, passInDb);
+const isValidPassword = (userInDb, pass) => {
+    return bcrypt.compareSync(pass, userInDb.password);
 }
 
-export default { __filename, __dirname, createHash, isValidPassword };
+export { __filename, __dirname, createHash, isValidPassword };
