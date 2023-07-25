@@ -16,6 +16,7 @@ import http from 'http';
 import mongoose from "mongoose";
 import UsersRouter from './router/users.routes.js';
 import mainRoutes from './router/main.routes.js';
+import passport from './config/passport.config.js';
 
 
 const app = express()
@@ -49,6 +50,9 @@ app.use(session({
     resave: false,
     saveUninitialized: false
 }));
+
+app.use(passport.initialize());
+app.use(passport.session());
 
 //estructura handlebars
 app.engine("handlebars", engine())

@@ -3,6 +3,7 @@ import Users from "../controllers/users.dbclass.js";
 import Products from "../controllers/ProductManager.js";
 import { createHash, isValidPassword } from "../utils.js";
 import userModel from "../models/users.model.js";
+import passport from "../config/passport.config.js";
 
 
 const users = new Users();
@@ -83,16 +84,20 @@ const mainRoutes = (io, store, baseUrl, productsPerPage) => {
             req.sessionStore.lastName = user.lastName;
             res.redirect('http://localhost:3000');
         }
+
+    router.get('/regfail', async (req, res) => {
+        res.render('registration_err', {});
+    });
         
-        router.post('/register', async (req, res) => {
-            const { firstName, lastName, userName, password } = req.body;
-            if (!firstName || !lastName || !userName || !password ) res.status(400).send('Faltan campos obligatorios en el body');
-            const newUser = { firstName: firstName, lastName: lastName, userName: userName, password: createHash(password)};
+    router.post('/register', passport.authenticate('authRegistration', { failureRedirect: '/regfail' }), async (req, res) => {
+        const { firstName, lastName, userName, password } = req.body;
+        if (!firstName || !lastName || !userName || !password ) res.status(400).send('Faltan campos obligatorios en el body');
+        const newUser = { firstName: firstName, lastName: lastName, userName: userName, password: createHash(password)};
             
-            console.log(newUser)
-            const process = userModel.create(newUser)
-            res.status(200).send(process);
-        });
+        console.log(newUser)
+        const process = userModel.create(newUser)
+        res.status(200).send(process);
+    });
 
 
         res.redirect(baseUrl);
