@@ -72,18 +72,18 @@ const mainRoutes = (io, store, baseUrl, productsPerPage) => {
         
         if (!user) { 
             req.sessionStore.errorMessage = 'No se encuentra el usuario'
-            res.redirect('http://localhost:3000');
         } else if (!isValidPassword(user, login_password)) {
             req.sessionStore.errorMessage = 'Clave incorrecta'
-            res.redirect('http://localhost:3000');
             
         } else {
             req.sessionStore.userValidated = true;
             req.sessionStore.errorMessage = '';
             req.sessionStore.firstName = user.firstName;
             req.sessionStore.lastName = user.lastName;
-            res.redirect('http://localhost:3000');
         }
+
+        res.redirect(baseUrl);
+    });
 
     router.get('/regfail', async (req, res) => {
         res.render('registration_err', {});
@@ -97,10 +97,6 @@ const mainRoutes = (io, store, baseUrl, productsPerPage) => {
         console.log(newUser)
         const process = userModel.create(newUser)
         res.status(200).send(process);
-    });
-
-
-        res.redirect(baseUrl);
     });
     
     return router;
