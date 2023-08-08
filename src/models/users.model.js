@@ -2,7 +2,7 @@ import mongoose from 'mongoose';
 
 mongoose.pluralize(null);
 
-const collection = 'users';
+const collection = 'users_camila';
 
 const schema = new mongoose.Schema({
     firstName: { type: String, required: true },

@@ -21,7 +21,7 @@ import passport from './config/passport.config.js';
 
 const app = express()
 const PORT = parseInt(process.env.PORT) || 3000;
-const MONGOOSE_URL = process.env.MONGOOSE_URL || 'mongodb://127.0.0.1';
+const MONGOOSE_URL = process.env.MONGOOSE_URL || 'mongodb://127.0.0.1:27017/coder51220';
 const COOKIE_SECRET = process.env.COOKIE_SECRET || 'abcdefgh12345678';
 const BASE_URL = `http://localhost:${PORT}`;
 const PRODUCTS_PER_PAGE = 10;

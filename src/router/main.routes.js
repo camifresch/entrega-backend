@@ -13,7 +13,6 @@ const mainRoutes = (io, store, baseUrl, productsPerPage) => {
     const router = Router();
 
     router.get('/', async (req, res) => {        
-        
         store.get(req.sessionID, async (err, data) => {
             if (err) console.log(`Error al recuperar datos de sesión (${err})`);
 
@@ -39,6 +38,8 @@ const mainRoutes = (io, store, baseUrl, productsPerPage) => {
                     pagesArray: pagesArray
                 }
 
+                console.log('user:', user)
+
                 res.render('products', { products: result.docs, pagination: pagination, user: req.sessionStore });
             } else {
                 res.render('login', { sessionInfo: req.sessionStore });
@@ -50,15 +51,12 @@ const mainRoutes = (io, store, baseUrl, productsPerPage) => {
         res.render('registration', {});
     });
 
-    
-    
     router.get('/logout', async (req, res) => {
         req.session.userValidated = req.sessionStore.userValidated = false;
         
         req.session.destroy((err) => {
             req.sessionStore.destroy(req.sessionID, (err) => {
                 if (err) console.log(`Error al destruir sesión (${err})`);
-                
                 console.log('Sesión destruída');
                 res.redirect(baseUrl);
             });
@@ -67,14 +65,14 @@ const mainRoutes = (io, store, baseUrl, productsPerPage) => {
     
     router.post('/login', async (req, res) => {
         req.sessionStore.userValidated = false
-        const { login_email, login_password } = req.body; 
+        const { login_email, login_password } = req.body;
         const user = await userModel.findOne({ userName: login_email });
         
         if (!user) { 
             req.sessionStore.errorMessage = 'No se encuentra el usuario'
         } else if (!isValidPassword(user, login_password)) {
             req.sessionStore.errorMessage = 'Clave incorrecta'
-            
+            // res.redirect('http://localhost:3000');
         } else {
             req.sessionStore.userValidated = true;
             req.sessionStore.errorMessage = '';
@@ -93,8 +91,6 @@ const mainRoutes = (io, store, baseUrl, productsPerPage) => {
         const { firstName, lastName, userName, password } = req.body;
         if (!firstName || !lastName || !userName || !password ) res.status(400).send('Faltan campos obligatorios en el body');
         const newUser = { firstName: firstName, lastName: lastName, userName: userName, password: createHash(password)};
-            
-        console.log(newUser)
         const process = userModel.create(newUser)
         res.status(200).send(process);
     });

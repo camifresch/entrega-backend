@@ -18,13 +18,13 @@ ViewRouter.get("/products?", async (req, res) => {
     page: resPage,
   } = await productManager.getProducts(query, limit, page, sort);
   if (hasNextPage)
-    nextLink = `http://localhost:3000/products/?${
+    nextLink = `products/?${
       query ? "query=" + query + "&" : ""
     }${"limit=" + limit}${"&page=" + (+resPage + 1)}${
       sort ? "&sort=" + sort : ""
     }`;
   if (hasPrevPage)
-    prevLink = `http://localhost:3000/products/?${
+    prevLink = `products/?${
       query ? "query=" + query + "&" : ""
     }${"limit=" + limit}${"&page=" + (+resPage - 1)}${
       sort ? "&sort=" + sort : ""}`;
