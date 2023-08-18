@@ -1,35 +1,70 @@
 import passport from "passport";
-import LocalStrategy from "passport-local";
+import GithubStrategy from 'passport-github2';
+import local from "passport-local";
 import userModel from "../models/users.model.js";
+import { createHash, isValidPassword } from "../utils.js";
 
+const LocalStrategy = local.Strategy;
 
-const verifyAuthRegistration = async (userName, password, done) => {
-    try {
-        const user = await userModel.findOne({ userName: userName });
+const initializePassport = async() => {
 
-        if (user === null) {
-            return done(null, { _id: 0 });
-        } else {
-            return done(null, false, { message: 'El email ya se encuentra registrado' });
+    const githubData = {
+        clientID: 'Iv1.574f670264322cb9',
+        clientSecret: '3d88a97a3e5f96c4c059b0c78b313232783a99ce',
+        callbackUrl: 'http://localhost:3000/api/sessions/githubcallback'
+    };
+
+    const verifyAuthGithub = async (accessToken, refreshToken, profile, done) => {
+        try {
+            const user = await userModel.findOne({ userName: profile._json.email });
+
+            if (!user) {
+                done(null, false);
+            } else {
+                done(null, user);
+            }
+        } catch (err) {
+            return done(err.message);
         }
-    } catch(err) {
-        return done(err.message);
     }
-};
 
-passport.use('authRegistration', new LocalStrategy({ usernameField: 'userName', passwordField: 'password' }, verifyAuthRegistration));
+    passport.use('github', new GithubStrategy(githubData, verifyAuthGithub));
 
-passport.serializeUser((user, done) => {
+    passport.use('register', new LocalStrategy(
+        { passReqToCallback: true, usernameField: 'userName', passwordField: 'password', session: false }, async(userName, password, done) => {
+
+            try {
+            
+                const exists = await userService.getUserBy({ userName: userName });
+                if(exists) return done(null, false, { message: 'El usuario ya se encuentra registrado' });
+                
+                const newUser = {
+                    firstName: firstName,
+                    lastName: lastName,
+                    userName: userName,
+                    password: createHash(password),
+                }
+
+                let result = await userService.addUser(newUser);
+                return done(null, result);
+            } catch(err) {
+                return done(err.message);
+            }
+        }))
+
+    passport.serializeUser((user, done) => {
     done(null, user._id);
-});
+        });
 
-passport.deserializeUser(async (id, done) => {
+    passport.deserializeUser(async (id, done) => {
     try {
         const user = await userModel.findById(id);
         done(null, user);
     } catch (err) {
         done(err.message);
     }
-});
+        });
 
-export default passport;
+}
+
+export default initializePassport;

@@ -1,4 +1,3 @@
-
 import {} from 'dotenv/config'
 import express from "express";
 import ProductRouter from "./router/product.routes.js"
@@ -16,7 +15,9 @@ import http from 'http';
 import mongoose from "mongoose";
 import UsersRouter from './router/users.routes.js';
 import mainRoutes from './router/main.routes.js';
-import passport from './config/passport.config.js';
+import passport from 'passport';
+import initializePassport from './config/passport.config.js';
+import sessionRoutes from './router/session.routes.js';
 
 
 const app = express()
@@ -51,6 +52,7 @@ app.use(session({
     saveUninitialized: false
 }));
 
+initializePassport();
 app.use(passport.initialize());
 app.use(passport.session());
 
@@ -76,6 +78,7 @@ io.on('connection', (socket) => {
     });
 });
 
+app.use('/api/sessions', sessionRoutes);
 
 app.use("/api/product", ProductRouter(io)) 
 app.use("/api/cart", CartRouter)

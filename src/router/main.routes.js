@@ -3,7 +3,8 @@ import Users from "../controllers/users.dbclass.js";
 import Products from "../controllers/ProductManager.js";
 import { createHash, isValidPassword } from "../utils.js";
 import userModel from "../models/users.model.js";
-import passport from "../config/passport.config.js";
+import initializePassport from "../config/passport.config.js";
+import passport from "passport";
 
 const users = new Users();
 const manager = new Products();
@@ -49,6 +50,10 @@ const mainRoutes = (io, store, baseUrl, productsPerPage) => {
     }
   });
 
+  router.get('/login', async (req, res) => {
+    res.render('login');
+  });
+
   router.get("/register", async (req, res) => {
     res.render("registration", {});
   });
@@ -89,9 +94,7 @@ const mainRoutes = (io, store, baseUrl, productsPerPage) => {
     res.render("registration_err", {});
   });
 
-  router.post(
-    "/register",
-    passport.authenticate("authRegistration", { failureRedirect: "/regfail" }),
+  router.post("/register", passport.authenticate("register", { failureRedirect: "/regfail" }),
     async (req, res) => {
       const { firstName, lastName, userName, password } = req.body;
       if (!firstName || !lastName || !userName || !password)
