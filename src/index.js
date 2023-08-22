@@ -49,12 +49,11 @@ app.use(session({
     store: store,
     secret: COOKIE_SECRET,
     resave: false,
-    saveUninitialized: false
+    saveUninitialized: true
 }));
 
-initializePassport();
 app.use(passport.initialize());
-app.use(passport.session());
+// app.use(passport.session());
 
 //estructura handlebars
 app.engine("handlebars", engine())
@@ -78,7 +77,7 @@ io.on('connection', (socket) => {
     });
 });
 
-app.use('/api/sessions', sessionRoutes);
+app.use('/api/sessions', sessionRoutes());
 
 app.use("/api/product", ProductRouter(io)) 
 app.use("/api/cart", CartRouter)

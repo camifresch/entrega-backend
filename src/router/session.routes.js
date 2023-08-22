@@ -4,7 +4,7 @@ import initializePassport from "../config/passport.config.js";
 
 initializePassport();
 
-const sessionRoutes = () => {    
+const sessionRoutes = () => {
     const router = Router();
 
     router.get('/github', passport.authenticate('github', { scope: ['user:email'] }), async (req, res) => {
@@ -12,6 +12,7 @@ const sessionRoutes = () => {
 
     router.get('/githubcallback', passport.authenticate('github', { failureRedirect: '/login' }), async (req, res) => {
         req.session.user = req.user;
+        console.log(req.session.user);
         res.redirect('/');
     });
 

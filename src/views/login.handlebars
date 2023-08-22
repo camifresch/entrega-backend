@@ -12,20 +12,20 @@
         <form class="p-4" action="login" method="post">
             <div class="form-group mb-4">
                 <label for="login_email">Email</label>
-                <input type="email" class="form-control" name="login_email" required="required">
+                <input type="email" class="form-control" name="login_email" required="required" autocomplete="on">
             </div>
 
             <div class="form-group mb-4">
                 <label for="login_password">Clave</label>
-                <input type="password" class="form-control" name="login_password" required="required">
+                <input type="password" class="form-control" name="login_password" required="required" autocomplete="off">
             </div>
 
             <div class="form-group mb-4">
-                <label class="form-check-label" for="exampleCheck1"><a href="register">Registrar nuevo usuario</a></label>
+                <label class="form-check-label"><a href="register">Registrar nuevo usuario</a></label>
             </div>
 
-            <div>
-                <a href="/api/sessions/github"><button>Inicializar con GitHub</button></a>
+            <div class="form-group mb-4">
+                <label class="form-check-label"><a href="/api/sessions/github">Iniciar con Github</a></label>
             </div>
 
             <div>
