@@ -12,9 +12,9 @@ const initializePassport = async () => {
         clientSecret: '3d88a97a3e5f96c4c059b0c78b313232783a99ce',
         callbackUrl: 'http://localhost:3000/api/sessions/githubcallback'
         
-    // clientID: "Iv1.2160438db8b06c53",
-    // clientSecret: "88dfabd35a94c47466d448cae5d1d0274711355b",
-    // callbackUrl: "http://localhost:3000/api/sessions/githubcallback",
+    /* clientID: "Iv1.2160438db8b06c53",
+    clientSecret: "88dfabd35a94c47466d448cae5d1d0274711355b",
+    callbackUrl: "http://localhost:3000/api/sessions/githubcallback", */
   };
 
   const verifyAuthGithub = async (accessToken, refreshToken, profile, done) => {
