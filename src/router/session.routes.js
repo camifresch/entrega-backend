@@ -7,14 +7,12 @@ initializePassport();
 const sessionRoutes = () => {
     const router = Router();
 
-    router.get('/github', passport.authenticate('github', { scope: ['user:email'] }), async (req, res) => {
-    });
+    router.get('/github', passport.authenticate('github', { scope: ['user:email'] }));
 
-    router.get('/githubcallback', passport.authenticate('github', { failureRedirect: '/login' }), async (req, res) => {
-        req.session.user = req.user;
-        console.log(req.session.user);
-        res.redirect('/');
-    });
+router.get('/githubcallback', passport.authenticate('github', {
+  successRedirect: '/products',
+  failureRedirect: '/login'
+}));
 
     return router;
 }
