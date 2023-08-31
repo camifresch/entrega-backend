@@ -18,7 +18,7 @@ import mainRoutes from './router/main.routes.js';
 import passport from 'passport';
 import initializePassport from './config/passport.config.js';
 import sessionRoutes from './router/session.routes.js';
-
+import { v4 as uuidv4 } from 'uuid';
 
 const app = express()
 const PORT = parseInt(process.env.PORT) || 3000;
@@ -58,14 +58,13 @@ app.use(session({
     resave: false,
     saveUninitialized: false,
     rolling: true,
-    genid: (req) => {
-        req.sessionStore = {};
-        return 'randomString';
+    genid: () => {
+        return uuidv4();
     }
 }));
 
 app.use(passport.initialize());
-// app.use(passport.session());
+app.use(passport.session());
 
 //estructura handlebars
 app.engine("handlebars", engine())

@@ -13,7 +13,7 @@ const mainRoutes = (io, store, baseUrl, productsPerPage) => {
   const router = Router();
 
   router.get("/", async (req, res) => {
-    if (req.session !== null && req.sessionStore.userValidated) {
+    if (req.session !== null && req.session.userValidated) {
       if (req.query.page === undefined) req.query.page = 0;
 
       const result = await manager.getProductsPaginated(
@@ -46,7 +46,7 @@ const mainRoutes = (io, store, baseUrl, productsPerPage) => {
       });
     } else {
       console.log("Error al recuperar datos de sesión");
-      res.render("login", { sessionInfo: req.sessionStore });
+      res.render("login", { sessionInfo: req.session }); 
     }
   });
 
@@ -81,10 +81,10 @@ const mainRoutes = (io, store, baseUrl, productsPerPage) => {
       req.sessionStore.errorMessage = "Clave incorrecta";
       // res.redirect('http://localhost:3000');
     } else {
-      req.sessionStore.userValidated = true;
-      req.sessionStore.errorMessage = "";
-      req.sessionStore.firstName = user.firstName;
-      req.sessionStore.lastName = user.lastName;
+      req.session.userValidated = true; 
+      req.session.errorMessage = "";
+      req.session.firstName = user.firstName;
+      req.session.lastName = user.lastName;
     }
 
     res.redirect(baseUrl);

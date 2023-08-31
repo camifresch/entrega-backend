@@ -21,18 +21,12 @@ const initializePassport = async () => {
     try {
       console.log(profile);
       const user = await userModel.findOne({ userName: profile._json.email });
-
-      if (!user) {
-        req.sessionStore = req.sessionStore || {};
-        req.sessionStore.userValidated = true;
-        return done(null, profile);
-
-      } else {
-        req.sessionStore = req.sessionStore || {};
-        req.sessionStore.userValidated = false;
-
-        return done(null, false);
   
+      if (!user) {
+        return done(null, profile);
+      } else {
+        user.userValidated = false;
+        return done(null, user);
       }
     } catch (err) {
       return done(err.message);
