@@ -48,8 +48,20 @@ const store =  MongoStore.create({ mongoUrl: MONGOOSE_URL, mongoOptions: {}, ttl
 app.use(session({
     store: store,
     secret: COOKIE_SECRET,
+    resave: false, 
+    saveUninitialized: true,
+    cookie: {
+        httpOnly: true,
+        secure: false
+    },
+    name: 'sessionID',  
     resave: false,
-    saveUninitialized: true
+    saveUninitialized: false,
+    rolling: true,
+    genid: (req) => {
+        req.sessionStore = {};
+        return 'randomString';
+    }
 }));
 
 app.use(passport.initialize());
