@@ -9,7 +9,7 @@ const UsersRouter = (io) => {
             const process = await userModel.find();
             res.status(200).send({ status: 'OK', data: process });
         } catch (err) {
-            res.status(500).send({ status: 'ERR', error: err });
+            res.status(500).send({ status: 'ERR', error: err.message });
         }
     });
 

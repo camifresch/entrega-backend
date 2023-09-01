@@ -48,19 +48,8 @@ const store =  MongoStore.create({ mongoUrl: MONGOOSE_URL, mongoOptions: {}, ttl
 app.use(session({
     store: store,
     secret: COOKIE_SECRET,
-    resave: false, 
-    saveUninitialized: true,
-    cookie: {
-        httpOnly: true,
-        secure: false
-    },
-    name: 'sessionID',  
     resave: false,
-    saveUninitialized: false,
-    rolling: true,
-    genid: () => {
-        return uuidv4();
-    }
+    saveUninitialized: false
 }));
 
 app.use(passport.initialize());
@@ -89,8 +78,7 @@ io.on('connection', (socket) => {
 });
 
 app.use('/api/sessions', sessionRoutes());
-
-app.use("/products", ProductRouter(io)) 
+app.use("/api/product", ProductRouter(io)) 
 app.use("/api/cart", CartRouter)
 app.use('/realtimeproducts', ViewRouter);
 app.use('/api', UsersRouter(io));

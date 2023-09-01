@@ -11,7 +11,8 @@ const schema = new mongoose.Schema({
     password: { type: String, required: true },
     gender: { type: String, enum: ['F', 'M']},
     role: { type: String, enum: ['usuario', 'admin']},
-    avatar: String
+    avatar: String,
+    validated: { type: Boolean, required: true, default: false }
 });
 
 

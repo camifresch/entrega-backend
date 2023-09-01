@@ -4,13 +4,13 @@ import Products from ".././controllers/ProductManager.js";
 
 const ProductRouter = (io) => {
     const router = Router();
-    const product = new Products();
+    const manager = new Products();
     
     const validate = async (req, res, next) => {
-        if (req.session.userValidated) {
+        if (req.session.user.validated) {
             next();
         } else {
-            res.status(401).sebd({ status: 'ERR', error: 'No tiene autorizacion para realizar esta solicitud'});
+            res.status(401).send({ status: 'ERR', error: 'No tiene autorizacion para realizar esta solicitud'});
         }
     }
 
@@ -20,7 +20,7 @@ const ProductRouter = (io) => {
             const products = await manager.getProducts(query, limit, page, sort);
             res.status(200).send({ data: products });
         } catch (err) {
-            res.status(500).send({ error: err });
+            res.status(500).send({ error: err.message });
         }
     });
 
@@ -30,7 +30,7 @@ const ProductRouter = (io) => {
             const product = await manager.getProductById(id);
             res.status(200).send({ status: 'OK', data: product });
         } catch (err) {
-            res.status(500).send({ status: 'ERR', error: err });
+            res.status(500).send({ status: 'ERR', error: err.message });
         }
     });
 
