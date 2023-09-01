@@ -90,7 +90,7 @@ io.on('connection', (socket) => {
 
 app.use('/api/sessions', sessionRoutes());
 
-app.use("/api/product", ProductRouter(io)) 
+app.use("/products", ProductRouter(io)) 
 app.use("/api/cart", CartRouter)
 app.use('/realtimeproducts', ViewRouter);
 app.use('/api', UsersRouter(io));

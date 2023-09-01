@@ -23,9 +23,9 @@ const initializePassport = async () => {
       const user = await userModel.findOne({ userName: profile._json.email });
   
       if (!user) {
-        return done(null, profile);
+        return done(null, false);
       } else {
-        user.userValidated = false;
+        user.userValidated = true;
         return done(null, user);
       }
     } catch (err) {
